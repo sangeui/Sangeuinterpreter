@@ -29,11 +29,19 @@ extension ClassCallable: CustomStringConvertible {
 
 extension ClassCallable: Callable {
     var arity: Int {
+        if let initializer = self.find(method: "init") {
+            return initializer.arity
+        }
+        
         return .zero
     }
     
     func call(interpreter: Interpreter, arguments: [Any?]) throws -> Any? {
         let instance = Instance(class: self)
+        
+        if let initializer = self.find(method: "init") {
+            _ = try initializer.bind(instance: instance).call(interpreter: interpreter, arguments: arguments)
+        }
         
         return instance
     }

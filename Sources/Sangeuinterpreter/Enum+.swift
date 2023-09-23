@@ -12,5 +12,5 @@ enum ClassType {
 }
 
 enum FunctionType {
-    case NONE, FUNCTION, METHOD
+    case NONE, FUNCTION, INITIALIZER, METHOD
 }

@@ -10,17 +10,19 @@ import Foundation
 final class FunctionCallable {
     private let declaration: Stmt.Function
     private let closure: Environment
+    private let isInitializer: Bool
     
-    init(declaration: Stmt.Function, closure: Environment) {
+    init(declaration: Stmt.Function, closure: Environment, isInitializer: Bool) {
         self.declaration = declaration
         self.closure = closure
+        self.isInitializer = isInitializer
     }
     
     func bind(instance: Instance) -> FunctionCallable {
         let environment = Environment(enclosing: self.closure)
         environment.define(name: "this", value: instance)
         
-        return .init(declaration: self.declaration, closure: environment)
+        return .init(declaration: self.declaration, closure: environment, isInitializer: self.isInitializer)
     }
 }
 
@@ -44,8 +46,16 @@ extension FunctionCallable: Callable {
             try interpreter.execute(block: declaration.body, environment: environment)
         } catch {
             if let returnException = error as? Return {
+                if self.isInitializer {
+                    return try self.closure.get(at: .zero, name: "this")
+                }
+                
                 return returnException.value
             }
+        }
+        
+        if self.isInitializer {
+            return try self.closure.get(at: .zero, name: "this")
         }
         
         return nil

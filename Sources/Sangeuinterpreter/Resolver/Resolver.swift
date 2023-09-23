@@ -42,7 +42,13 @@ extension Resolver: StmtVisitorProtocol {
         self.declare(token: stmt.name)
         
         for method in stmt.methods {
-            try self.resolve(function: method, type: .METHOD)
+            var declaration: FunctionType = .METHOD
+            
+            if method.name.lexeme == "init" {
+                declaration = .INITIALIZER
+            }
+            
+            try self.resolve(function: method, type: declaration)
         }
         
         self.define(token: stmt.name)
@@ -95,6 +101,10 @@ extension Resolver: StmtVisitorProtocol {
         
         guard let value = stmt.value else {
             return
+        }
+        
+        if currentFunction == .INITIALIZER {
+            Sangeuinterpreter.error(token: stmt.keyword, message: "Can't return a value from an initializer.")
         }
         
         try self.resolve(expression: value)

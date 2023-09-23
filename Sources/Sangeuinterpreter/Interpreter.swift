@@ -77,7 +77,8 @@ extension Interpreter: StmtVisitorProtocol {
         var methods: [String: FunctionCallable] = .init()
         
         for method in stmt.methods {
-            let function = FunctionCallable(declaration: method, closure: self.environment)
+            let isInitializer = method.name.lexeme == "init"
+            let function = FunctionCallable(declaration: method, closure: self.environment, isInitializer: isInitializer)
             methods.updateValue(function, forKey: method.name.lexeme)
         }
         
@@ -130,7 +131,7 @@ extension Interpreter: StmtVisitorProtocol {
     }
     
     func visitFunctionStmt(_ stmt: Stmt.Function) throws -> Void {
-        let function = FunctionCallable(declaration: stmt, closure: self.environment)
+        let function = FunctionCallable(declaration: stmt, closure: self.environment, isInitializer: false)
         
         self.environment.define(name: stmt.name.lexeme, value: function)
     }
