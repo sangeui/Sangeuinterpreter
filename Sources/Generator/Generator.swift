@@ -42,6 +42,19 @@ extension Generator {
             
             self.define(class: `class`, fields: fields, base: base, contents: &contents)
         }
+        
+        contents.append("}")
+        contents.append("\n")
+        contents.append("\n")
+        
+        contents.append("extension \(base): Hashable {\n")
+        contents.append("\tstatic func ==(lhs: \(base), rhs: \(base)) -> Bool {\n")
+        contents.append("\t\treturn ObjectIdentifier(lhs) == ObjectIdentifier(rhs)\n")
+        contents.append("\t}\n")
+        contents.append("\n")
+        contents.append("\tfunc hash(into hasher: inout Hasher) {\n")
+        contents.append("\t\treturn ObjectIdentifier(self).hash(into: &hasher)\n")
+        contents.append("\t}\n")
         contents.append("}")
         
         self.write(string: contents, url: url)
