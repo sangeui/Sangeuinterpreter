@@ -6,17 +6,18 @@
 //
 
 import Foundation
+import Sangeuinterpreter
 
 func runScript() {
     do {
-        
+        try Sangeuinterpreter.runFile(path: try getScriptFilePath())
     } catch {
         exit(64)
     }
 }
 
 func runPrompt() {
-    
+    Sangeuinterpreter.runPrompt()
 }
 
 func getEffectiveArguments() -> [String] {
